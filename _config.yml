@@ -9,10 +9,10 @@ name: Qingzheng Yu
 author: Amit Merchant
 
 # Short bio or description (displayed in the header)
-description: An elegant Jekyll theme
+description: An astrophysics Ph.D candidate at Xiamen University
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
-avatar: /images/reverie.png
+avatar: /images/qzy_ps.png
 
 #
 # Flags below are optional
@@ -24,7 +24,7 @@ footer-links:
   email: q.z.yu@foxmail.com
   facebook:
   flickr:
-  github: qz-yu/qz-yu.github.io
+  github: qz-yu
   instagram:
   linkedin: 
   pinterest:
