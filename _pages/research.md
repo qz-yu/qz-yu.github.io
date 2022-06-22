@@ -5,6 +5,8 @@ permalink: /research/
 ---
 ## HI Observations of MaNGA Major Merger Pairs
 
+Link: [arXiv:2206.06330](https://arxiv.org/abs/2206.06330)
+
 <figure>
 <p align="center">
 <img src="https://qz-yu.github.io/images/optical_image_hi_spec.png" >
