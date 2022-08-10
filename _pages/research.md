@@ -5,7 +5,7 @@ permalink: /research/
 ---
 ## HI Observations of MaNGA Major Merger Pairs
 
-Link: [arXiv:2206.06330](https://arxiv.org/abs/2206.06330)
+Link: [Yu et al. 2022, ApJ, 934, 114](https://ui.adsabs.harvard.edu/abs/2022ApJ...934..114Y/abstract)
 
 <figure>
 <p align="center">
