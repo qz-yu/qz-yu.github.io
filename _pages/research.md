@@ -18,3 +18,20 @@ The role of HI content in galaxy interactions is still under debate. To study th
 <img src="https://qz-yu.github.io/images/major_pair_dlt_properties_vs_stages_comp_new.png" >
 </p>
 </figure>
+
+---
+## HI Absorption in Low-power Radio AGNs Detected by FAST
+
+Link: [Yu et al. 2023, accepted to ApJ](https://ui.adsabs.harvard.edu/abs/2023arXiv230601050Y/abstract)
+
+<figure>
+<p align="center">
+<img src="https://qz-yu.github.io/images/power_z_dr.png" >
+</p>
+</figure>
+We report the discovery of three HI absorbers toward low-power radio active galactic nuclei (AGNs) in a pilot HI absorption survey with the Five-hundred-meter Aperture Spherical radio Telescope (FAST). Compared to past studies, FAST observations have explored lower radio powers by ∼0.4 dex and detected these weakest absorbers at given redshifts. By comparing the gas properties and kinematics of sources along radio powers, we aim to explore the interplay between AGN and the surrounding interstellar medium (ISM). Compared to brighter sources at similar redshifts, our observations suggest a slightly lower detection rate of HI absorption lines (∼11.5%) in low-power radio AGNs with $\text{log}(P_{\text{1.4 GHz}}/\text{W Hz}^{-1})=21.8-23.7$. The low-power sources with $\text{log}(P_{\text{1.4 GHz}}/\text{W Hz}^{-1})<23$ have a lower detection rate of ∼6.7%. Due to the incompleteness of the sample, these detection rates may represent the lower limits. The selection of more extended sources and dilution by HI emission at lower redshifts may contribute to the lower detection rate of HI absorption lines. These detected absorbers present relatively narrow line widths and comparable column densities consistent with previous observations. One absorber has a symmetric profile with a large velocity offset, while the other two show asymmetric profiles that can be decomposed into multiple components, suggesting various possibilities of gas origins and kinematics. These HI absorbers may have connections with rotating disks, gas outflows, galactic gas clouds, gas fueling of the AGN, and jet-ISM interactions, which will be further investigated with the upcoming systematic survey and spatially resolved observations.
+<figure>
+<p align="center">
+<img src="https://qz-yu.github.io/images/optical_img_spec_fit_hor.png" >
+</p>
+</figure>
