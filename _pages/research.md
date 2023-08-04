@@ -22,7 +22,7 @@ The role of HI content in galaxy interactions is still under debate. To study th
 ---
 ## HI Absorption in Low-power Radio AGNs Detected by FAST
 
-Link: [Yu et al. 2023, accepted to ApJ](https://ui.adsabs.harvard.edu/abs/2023arXiv230601050Y/abstract)
+Link: [Yu et al. 2023, ApJ, 952, 144](https://ui.adsabs.harvard.edu/abs/2023ApJ...952..144Y/abstract)
 
 <figure>
 <p align="center">
