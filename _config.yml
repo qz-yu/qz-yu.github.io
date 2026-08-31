@@ -2,22 +2,18 @@
 # This file contains configuration flags to customize your site
 #
 
-# Name of your site (displayed in the header)
+# Site identity
 name: Qingzheng Yu
-
-# Name of the author
+title: Qingzheng Yu | Astrophysicist
 author: Qingzheng Yu
-
-# Short bio or description (displayed in the header)
-description: Postdoc Researcher in astrophysics from University of Florence
-
-# URL of your avatar or profile pic (you could use your GitHub profile pic)
-avatar: /images/qzy_ps.png
+description: Radio astronomer studying cold gas, galaxy evolution, and the circumgalactic medium.
+tagline: Tracing the cold gas that shapes galaxies.
+avatar: /images/qingzheng-yu-2026.jpg
 
 #
 # Flags below are optional
 #
-keywords: "Astrophysics"
+keywords: "Qingzheng Yu, astrophysics, radio astronomy, neutral hydrogen, HI, molecular gas, circumgalactic medium, galaxy evolution"
 # Includes an icon in the footer for each username you enter
 footer-links:
   dribbble:
@@ -26,13 +22,13 @@ footer-links:
   flickr:
   github: qz-yu
   instagram:
-  linkedin: 
+  linkedin:
   pinterest:
-  rss: rss
+  rss:
   twitter: Dr_QingzhengYu
   stackoverflow: 
   youtube: # channel/<your_long_string> or user/<user-name>
-  googleplus: # anything in your profile username that comes after plus.google.com/
+  googleplus:
   playconsole:
 
 
@@ -48,14 +44,20 @@ google_analytics: #UA-43339302-11
 
 # Your website URL (e.g. http://amitmerchant1990.github.io or http://www.amitmerchant.com)
 # Used for Sitemap.xml and your RSS feed
-url: http://qz-yu.github.io
+url: https://qz-yu.github.io
 enforce_ssl: https://qz-yu.github.io
 
 # If you're hosting your site at a Project repository on GitHub pages
 # (http://yourusername.github.io/repository-name)
 # and NOT your User repository (http://yourusername.github.io)
 # then add in the baseurl here, like this: "/repository-name"
-baseurl: "/"
+baseurl: ""
+
+# Academic profiles
+ads_url: https://ui.adsabs.harvard.edu/public-libraries/BvENxhsWRy6Og-b3Wj2Ahg
+orcid_url: https://orcid.org/0000-0003-3230-3981
+github_url: https://github.com/qz-yu
+cv_url: /files/Qingzheng_cv.pdf
 
 #
 # !! You don't need to change any of the configuration flags below !!
@@ -99,4 +101,3 @@ exclude:
   - LICENSE
   - README.md
   - CNAME
-

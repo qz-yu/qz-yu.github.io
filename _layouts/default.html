@@ -1,59 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>{% if page.title %}{{ page.title }} – {% endif %}{{ site.name }}</title>
+    <meta charset="utf-8">
+    <title>{% if page.title %}{{ page.title }} · {% endif %}{{ site.name }}</title>
     {% seo title=false %}
     {% include meta.html %}
 
-    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/assets/style.css" />
-    <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
-    <link rel="canonical" href="{{ site.url }}{{ page.url }}" />
+    <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
+    <link rel="canonical" href="{{ page.url | absolute_url }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <meta name="theme-color" content="#000000">
-    <meta http-equiv="content-language" content="en-us"/>
-    <meta name="google-site-verification" content="_dLzt_aq7qG4BRrG1MzbVvc40PNOmhtQNhfNHURbrPE" />
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ site.baseurl }}/images/favicon-32x32.png">
+    <meta name="theme-color" content="#f3f5f8">
+    <meta http-equiv="content-language" content="en-us">
+    <meta name="google-site-verification" content="_dLzt_aq7qG4BRrG1MzbVvc40PNOmhtQNhfNHURbrPE">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ '/images/favicon-32x32.png' | relative_url }}">
     {% include analytics_head.html %}
   </head>
 
-  <body>
-    <div id="bar"></div>
-    <div class="wrapper-container">
-      <div class="wrapper-masthead">
-        <div class="container">
-          <header class="masthead clearfix">
-            <a href="{{ site.baseurl }}/" class="site-avatar"><img src="{{ site.baseurl }}{{ site.avatar }}" alt="{{ site.title }}" /></a>
+  <body class="{{ page.body_class | default: 'site-page' }}">
+    <a class="skip-link" href="#main-content">Skip to content</a>
 
-            <div class="site-info">
-              <h1 class="site-name"><a href="{{ site.baseurl }}/">{{ site.name }}</a></h1>
-              <p class="site-description">{{ site.description }}</p> 
-            </div>
+    <header class="site-header">
+      <div class="wide-container header-inner">
+        <a class="site-brand" href="{{ '/' | relative_url }}" aria-label="Qingzheng Yu, home">
+          <span class="brand-mark" aria-hidden="true">QY</span>
+          <span class="brand-copy">
+            <strong>Qingzheng Yu</strong>
+            <span>Astrophysicist</span>
+          </span>
+        </a>
 
-            <nav>
-              <a href="{{ site.baseurl }}/">Home</a>
-              <a href="{{ site.baseurl }}/research">Research</a>
-              <a href="{{ site.baseurl }}/files/Qingzheng_cv.pdf">CV</a>
-              <a href="{{ site.baseurl }}/gallery">Gallery</a>
-              <a href="{{ site.baseurl }}/contact">Contact</a>
-            </nav>
-          </header>
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="is-active" aria-current="page"{% endif %}>Home</a>
+          <a href="{{ '/research/' | relative_url }}"{% if page.url == '/research/' %} class="is-active" aria-current="page"{% endif %}>Research</a>
+          <a href="{{ '/gallery/' | relative_url }}"{% if page.url == '/gallery/' %} class="is-active" aria-current="page"{% endif %}>Gallery</a>
+          <a href="{{ '/contact/' | relative_url }}"{% if page.url == '/contact/' %} class="is-active" aria-current="page"{% endif %}>Contact</a>
+          <a class="nav-cv" href="{{ site.cv_url | relative_url }}">CV <span aria-hidden="true">↗</span></a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content">
+      {{ content }}
+    </main>
+
+    <footer class="site-footer">
+      <div class="wide-container footer-grid">
+        <div class="footer-signoff">
+          <span class="footer-mark" aria-hidden="true"></span>
+          <p>{{ site.tagline }}</p>
+          <small>© {{ site.time | date: '%Y' }} Qingzheng Yu</small>
+        </div>
+        <div class="footer-links" aria-label="Academic and social profiles">
+          <a href="mailto:{{ site.footer-links.email }}">Email</a>
+          <a href="{{ site.ads_url }}">ADS</a>
+          <a href="{{ site.orcid_url }}">ORCID</a>
+          <a href="{{ site.github_url }}">GitHub</a>
         </div>
       </div>
-
-      <div class="wrapper-main">
-        <div id="main" role="main" class="container">
-          {{ content }}
-        </div>
-      </div>
-
-      <div class="wrapper-footer">
-        <div class="container">
-          <footer class="footer">
-              {% include svg-icons.html %}
-          </footer>
-        </div>
-      </div>
-    </div>
+    </footer>
 
     {% include analytics.html %}
   </body>

@@ -1,6 +1,8 @@
 <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<meta name="twitter:card" content="summary">
+<meta property="og:type" content="website">
 
 {% if page.excerpt %}
 <meta property="og:description" content="{{ page.excerpt| strip_html }}" />
@@ -14,6 +16,9 @@
 {% if page.title %}
 <meta property="og:title" content="{{ page.title }}" />
 <meta property="twitter:title" content="{{ page.title }}" />
+{% else %}
+<meta property="og:title" content="{{ site.name }}" />
+<meta property="twitter:title" content="{{ site.name }}" />
 {% endif %}
 
 {% if page.image %}
