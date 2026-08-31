@@ -121,19 +121,19 @@ description: Research by Qingzheng Yu on neutral hydrogen, galaxy interactions, 
     </div>
   </div>
 
-  <div class="research-media-grid research-media-reverse">
-    <figure class="research-figure research-figure-chart">
-      <img src="{{ '/images/hi-absorption-2023-fig2.webp' | relative_url }}" alt="Radio-power distributions of the FAST low-power radio AGN sample and the comparison sample from Maccagni et al. 2017" loading="lazy">
-      <figcaption>FAST extends H&nbsp;I absorption work into a substantially lower radio-power regime (Yu et al. 2023, Fig.&nbsp;2).</figcaption>
+  <div class="research-media-grid research-media-reverse research-media-spectrum">
+    <figure class="research-figure research-figure-spectrum">
+      <img src="{{ '/images/hi-absorption-2023-fig4.webp' | relative_url }}" alt="SDSS images and FAST H I absorption spectra with Gaussian decompositions for J1332+2634, J1512+3050, and J1628+2529" loading="lazy">
+      <figcaption>Host galaxies and decomposed FAST H&nbsp;I absorption profiles from the pilot survey (Yu et al. 2023, Fig.&nbsp;4).</figcaption>
     </figure>
     <div class="research-copy">
-      <p>Absorption against compact radio continuum sources can detect cold atomic gas independently of distance. My FAST survey pushes this technique toward lower-power radio AGNs, probing a regime where the connection between jets, circumnuclear gas, and larger galactic disks remains poorly constrained.</p>
-      <p>Line profiles reveal rotating structures, infalling clouds, outflows, and possible jet–ISM interactions. I combine the FAST census with spatially resolved VLA observations to identify which mechanisms dominate and how cold gas participates in both fueling and feedback.</p>
+      <p>Absorption against compact radio continuum sources can detect cold atomic gas independently of distance. My FAST programme extends this technique to 159 low-power radio sources; across the pilot and completed survey, we identify 15 absorbers and an overall detection rate of about 10%.</p>
+      <p>The resolved line profiles distinguish regular rotating structures from disturbed, redshifted or blueshifted gas. Most low-power systems are narrow and close to systemic velocity, while comparison with higher-power samples shows an increasing fraction of blueshifted absorbers—evidence that stronger radio activity more effectively drives atomic outflows.</p>
       <div class="inline-links">
         <a href="https://ui.adsabs.harvard.edu/abs/2023ApJ...952..144Y/abstract">Pilot survey · ApJ 2023 <span aria-hidden="true">↗</span></a>
         <a href="https://ui.adsabs.harvard.edu/abs/2026ApJ..1000..108S/abstract">Full survey · Su et al. 2026 <span aria-hidden="true">↗</span></a>
       </div>
-      <p class="authorship-note">Corresponding author on the full FAST survey.</p>
+      <p class="authorship-note">Corresponding author and FAST PI for the full survey.</p>
     </div>
   </div>
 </section>
