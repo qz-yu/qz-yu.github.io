@@ -1079,6 +1079,10 @@ sub {
   order: 2;
 }
 
+.research-media-spectrum {
+  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
+}
+
 .research-figure {
   overflow: hidden;
   border: 1px solid var(--line);
@@ -1096,9 +1100,9 @@ sub {
   aspect-ratio: 16 / 9;
 }
 
-.research-figure-chart img {
-  aspect-ratio: 1.42;
-  padding: 16px;
+.research-figure-spectrum img {
+  aspect-ratio: 1410 / 748;
+  padding: 8px;
   background: #fff;
   object-fit: contain;
 }
@@ -1550,6 +1554,10 @@ sub {
     aspect-ratio: 16 / 9;
   }
 
+  .research-figure-spectrum img {
+    aspect-ratio: 1410 / 748;
+  }
+
   .gallery-empty {
     grid-template-columns: 1fr;
   }
@@ -1768,6 +1776,10 @@ sub {
 
   .research-figure img {
     aspect-ratio: 4 / 3;
+  }
+
+  .research-figure-spectrum img {
+    aspect-ratio: 1410 / 748;
   }
 
   .research-sequence-steps {
