@@ -887,6 +887,131 @@ sub {
   font-size: clamp(2.15rem, 4.2vw, 3.55rem);
 }
 
+.research-sequence {
+  margin: 0 0 58px;
+  padding-left: 69px;
+}
+
+.research-sequence-steps {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  color: var(--soft);
+  font-size: 0.72rem;
+  letter-spacing: 0.035em;
+}
+
+.research-sequence-steps a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--accent-deep);
+}
+
+.research-sequence-steps span {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.research-sequence-steps i {
+  color: rgba(23, 73, 134, 0.42);
+  font-style: normal;
+}
+
+.research-sequence-track {
+  display: flex;
+  overflow-x: auto;
+  border: 1px solid rgba(23, 73, 134, 0.18);
+  border-radius: 22px;
+  background: #07111f;
+  box-shadow: 0 22px 46px rgba(23, 73, 134, 0.12);
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: rgba(126, 174, 226, 0.5) rgba(7, 17, 31, 0.75);
+  scrollbar-width: thin;
+}
+
+.research-sequence-frame {
+  flex: 0 0 100%;
+  min-width: 0;
+  margin: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.research-sequence-frame img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #07111f;
+  object-fit: cover;
+}
+
+.research-sequence-frame figcaption {
+  display: grid;
+  grid-template-columns: minmax(90px, auto) minmax(0, 1fr) minmax(90px, auto);
+  align-items: center;
+  min-height: 70px;
+  gap: 18px;
+  padding: 13px 17px;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
+  background: #0b1b31;
+  color: rgba(235, 244, 255, 0.72);
+  font-size: 0.69rem;
+  line-height: 1.45;
+}
+
+.research-sequence-frame figcaption > span {
+  grid-column: 2;
+  text-align: center;
+}
+
+.research-sequence-frame figcaption strong {
+  display: block;
+  margin-bottom: 2px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.77rem;
+  letter-spacing: 0.04em;
+}
+
+.research-sequence-frame figcaption a {
+  grid-column: 3;
+  justify-self: end;
+  border: 1px solid rgba(169, 207, 248, 0.28);
+  border-radius: 999px;
+  padding: 8px 11px;
+  color: #dbeeff;
+  white-space: nowrap;
+}
+
+.research-sequence-frame figcaption .sequence-back {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+}
+
+.research-sequence-frame:first-child figcaption > span {
+  grid-column: 1 / 3;
+  text-align: left;
+}
+
+.research-sequence-frame:last-child figcaption > span {
+  grid-column: 2 / 4;
+  text-align: right;
+}
+
+.research-sequence-hint {
+  margin: 10px 4px 0;
+  color: var(--soft);
+  font-size: 0.66rem;
+  text-align: right;
+}
+
 .research-feature-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.18fr) minmax(260px, 0.82fr);
@@ -967,6 +1092,17 @@ sub {
   object-fit: cover;
 }
 
+.research-figure-wide img {
+  aspect-ratio: 16 / 9;
+}
+
+.research-figure-chart img {
+  aspect-ratio: 1.42;
+  padding: 16px;
+  background: #fff;
+  object-fit: contain;
+}
+
 .research-figure figcaption {
   padding: 12px 16px 14px;
   border-top: 1px solid var(--line);
@@ -977,6 +1113,19 @@ sub {
 
 .research-copy {
   padding-top: 2px;
+}
+
+.research-copy .authorship-note {
+  margin: 12px 0 0;
+  color: var(--soft);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+}
+
+.publication-role {
+  color: var(--soft);
+  font-size: 0.82em;
+  white-space: nowrap;
 }
 
 .research-block-milkyway {
@@ -1458,6 +1607,10 @@ sub {
     padding-left: 0;
   }
 
+  .research-sequence {
+    padding-left: 0;
+  }
+
   .research-media-grid {
     padding-left: 0;
   }
@@ -1615,6 +1768,38 @@ sub {
 
   .research-figure img {
     aspect-ratio: 4 / 3;
+  }
+
+  .research-sequence-steps {
+    overflow-x: auto;
+    padding-bottom: 4px;
+    white-space: nowrap;
+  }
+
+  .research-sequence-frame figcaption {
+    grid-template-columns: auto 1fr auto;
+    min-height: 66px;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .research-sequence-frame figcaption > span {
+    font-size: 0.61rem;
+  }
+
+  .research-sequence-frame figcaption a {
+    font-size: 0;
+    padding: 8px 10px;
+  }
+
+  .research-sequence-frame figcaption a b {
+    font-size: 0.85rem;
+  }
+
+  .research-sequence-frame:first-child figcaption > span,
+  .research-sequence-frame:last-child figcaption > span {
+    grid-column: 2;
+    text-align: center;
   }
 
   .publication-list li {
