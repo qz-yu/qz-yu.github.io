@@ -22,6 +22,44 @@ description: Research by Qingzheng Yu on neutral hydrogen, galaxy interactions, 
     </div>
   </div>
 
+  <div class="research-sequence" aria-label="HCG 100 from optical light to the published H I map">
+    <nav class="research-sequence-steps" aria-label="HCG 100 image sequence">
+      <a href="#hcg100-optical"><span>01</span> Optical RGB</a>
+      <i aria-hidden="true">→</i>
+      <a href="#hcg100-false-colour"><span>02</span> Add faint H&nbsp;I</a>
+      <i aria-hidden="true">→</i>
+      <a href="#hcg100-published"><span>03</span> Published map</a>
+    </nav>
+
+    <div class="research-sequence-track" tabindex="0" aria-label="Swipe or scroll horizontally to compare three views of HCG 100">
+      <figure class="research-sequence-frame" id="hcg100-optical">
+        <img src="{{ '/images/hcg100-optical.webp' | relative_url }}" alt="DECaLS g, r, and z composite image of HCG 100 and its surrounding galaxies">
+        <figcaption>
+          <span><strong>Optical RGB</strong>DECaLS <em>g/r/z</em> view of the 42-arcmin field.</span>
+          <a href="#hcg100-false-colour" aria-label="Show the H I false-colour view">Add H&nbsp;I <b aria-hidden="true">→</b></a>
+        </figcaption>
+      </figure>
+
+      <figure class="research-sequence-frame" id="hcg100-false-colour">
+        <img src="{{ '/images/hcg100-false-colour.webp' | relative_url }}" alt="False-colour image of diffuse FAST H I emission over the optical field around HCG 100" loading="lazy">
+        <figcaption>
+          <a class="sequence-back" href="#hcg100-optical" aria-label="Return to the optical RGB view"><b aria-hidden="true">←</b> Optical</a>
+          <span><strong>H&nbsp;I false colour</strong>Diffuse FAST emission reveals the extended neutral-gas envelope.</span>
+          <a href="#hcg100-published" aria-label="Show the published HCG 100 map">Fig.&nbsp;1 <b aria-hidden="true">→</b></a>
+        </figcaption>
+      </figure>
+
+      <figure class="research-sequence-frame" id="hcg100-published">
+        <img src="{{ '/images/hcg100-figure1.webp' | relative_url }}" alt="Published HCG 100 map with FAST H I contours, VLA contours, observing footprints, source labels, and velocity-gradient arrows" loading="lazy">
+        <figcaption>
+          <a class="sequence-back" href="#hcg100-false-colour" aria-label="Return to the H I false-colour view"><b aria-hidden="true">←</b> H&nbsp;I</a>
+          <span><strong>Published map</strong>FAST and VLA contours, survey footprints, sources, and coherent velocity gradients.</span>
+        </figcaption>
+      </figure>
+    </div>
+    <p class="research-sequence-hint">Swipe, scroll, or use the arrows to move through the comparison.</p>
+  </div>
+
   <div class="research-feature-grid">
     <div>
       <p>Neutral hydrogen becomes exceptionally difficult to detect once it spreads beyond galactic disks. I use ultra-deep FAST mapping to reach this low-column-density regime and reveal gas that conventional surveys miss.</p>
@@ -59,9 +97,9 @@ description: Research by Qingzheng Yu on neutral hydrogen, galaxy interactions, 
   </div>
 
   <div class="research-media-grid">
-    <figure class="research-figure">
-      <img src="{{ '/images/optical_image_hi_spec.png' | relative_url }}" alt="Optical images and H I spectra of galaxy pairs at pre-passage, pericenter, and apocenter stages" loading="lazy">
-      <figcaption>Representative MaNGA major-merger pairs and their FAST H&nbsp;I spectra.</figcaption>
+    <figure class="research-figure research-figure-wide">
+      <img src="{{ '/images/merger-ism-cgm.jpg' | relative_url }}" alt="A merger-driven gas-cycle diagram connecting ionized circumgalactic gas, atomic hydrogen, molecular hydrogen, star formation, and AGN activity" loading="lazy">
+      <figcaption>Cold-gas cycling through galaxy interactions: H&nbsp;I, H<sub>2</sub>, star formation, AGN activity, and the ionized CGM.</figcaption>
     </figure>
     <div class="research-copy">
       <p>Galaxy encounters rearrange angular momentum and compress gas, but the response of the atomic and molecular reservoirs changes from first approach to coalescence. I introduced kinematic asymmetry as an empirical merger-stage indicator and compared paired galaxies with carefully matched isolated controls.</p>
@@ -84,16 +122,18 @@ description: Research by Qingzheng Yu on neutral hydrogen, galaxy interactions, 
   </div>
 
   <div class="research-media-grid research-media-reverse">
-    <figure class="research-figure">
-      <img src="{{ '/images/absorption_rev.png' | relative_url }}" alt="Optical image and FAST H I absorption spectrum of a low-power radio AGN" loading="lazy">
-      <figcaption>A FAST H&nbsp;I absorber toward a low-power radio AGN.</figcaption>
+    <figure class="research-figure research-figure-chart">
+      <img src="{{ '/images/hi-absorption-2023-fig2.webp' | relative_url }}" alt="Radio-power distributions of the FAST low-power radio AGN sample and the comparison sample from Maccagni et al. 2017" loading="lazy">
+      <figcaption>FAST extends H&nbsp;I absorption work into a substantially lower radio-power regime (Yu et al. 2023, Fig.&nbsp;2).</figcaption>
     </figure>
     <div class="research-copy">
       <p>Absorption against compact radio continuum sources can detect cold atomic gas independently of distance. My FAST survey pushes this technique toward lower-power radio AGNs, probing a regime where the connection between jets, circumnuclear gas, and larger galactic disks remains poorly constrained.</p>
       <p>Line profiles reveal rotating structures, infalling clouds, outflows, and possible jet–ISM interactions. I combine the FAST census with spatially resolved VLA observations to identify which mechanisms dominate and how cold gas participates in both fueling and feedback.</p>
       <div class="inline-links">
         <a href="https://ui.adsabs.harvard.edu/abs/2023ApJ...952..144Y/abstract">Pilot survey · ApJ 2023 <span aria-hidden="true">↗</span></a>
+        <a href="https://ui.adsabs.harvard.edu/abs/2026ApJ..1000..108S/abstract">Full survey · Su et al. 2026 <span aria-hidden="true">↗</span></a>
       </div>
+      <p class="authorship-note">Corresponding author on the full FAST survey.</p>
     </div>
   </div>
 </section>
@@ -134,6 +174,11 @@ description: Research by Qingzheng Yu on neutral hydrogen, galaxy interactions, 
       <span>2026</span>
       <p><strong>Megaparsec-Scale Neutral Hydrogen Flows in the Neighborhood of Hickson Compact Group 100</strong><br>Yu et al. · <em>The Astrophysical Journal Letters</em></p>
       <a href="https://doi.org/10.3847/2041-8213/ae8f37" aria-label="Open Megaparsec-Scale Neutral Hydrogen Flows paper">↗</a>
+    </li>
+    <li>
+      <span>2026</span>
+      <p><strong>A FAST Survey of H&nbsp;I Absorption in Low-power Radio Sources</strong><br>Su, Yu<sup>†</sup> et al. · <em>The Astrophysical Journal</em> · <span class="publication-role"><sup>†</sup>Corresponding author</span></p>
+      <a href="https://ui.adsabs.harvard.edu/abs/2026ApJ..1000..108S/abstract" aria-label="Open A FAST Survey of H I Absorption in Low-power Radio Sources">↗</a>
     </li>
     <li>
       <span>2024</span>
