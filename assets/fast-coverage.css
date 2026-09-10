@@ -1,0 +1,38 @@
+.fast-study { padding-block: 40px 64px; }
+.fast-study-heading { margin-block: 26px 30px; max-width: 850px; }
+.fast-study-heading h1 { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); line-height: 1.2; margin-bottom: 16px; }
+.fast-study-heading p { color: var(--muted); }
+#fast-final-coverage-viz {
+  --background: #f3f5f8;
+  --foreground: #12243b;
+  --border: #8793a1;
+  --viz-series-1: #356fc8;
+  --viz-series-2: #b75a28;
+  --viz-series-3: #66b39e;
+  color: var(--foreground);
+}
+#fast-final-coverage-viz .fast-chart-title { font-size: 1.3rem; margin-bottom: 18px; }
+#fast-final-coverage-viz h3 { font-size: 1rem; line-height: 1.5; min-height: 3em; }
+#fast-final-coverage-viz .viz-controls,
+#fast-final-coverage-viz .viz-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+#fast-final-coverage-viz .viz-controls { margin-block: 16px; align-items: end; }
+#fast-final-coverage-viz .form-label { display: flex; flex-direction: column; gap: 6px; flex: 1 1 260px; min-width: 0; font-size: .875rem; }
+#fast-final-coverage-viz .form-select,
+#fast-final-coverage-viz .form-control { width: 100%; min-width: 0; box-sizing: border-box; font: inherit; font-size: 1rem; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px; padding: 10px 12px; min-height: 44px; }
+#fast-final-coverage-viz .btn { font: inherit; font-size: .875rem; cursor: pointer; border: 1px solid var(--line-strong); border-radius: 6px; padding: 10px 14px; min-height: 44px; background: var(--surface); color: var(--ink); }
+#fast-final-coverage-viz .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+#fast-final-coverage-viz .form-select:focus-visible,
+#fast-final-coverage-viz .form-control:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+#fast-final-coverage-viz .text-small { font-size: .875rem; line-height: 1.65; }
+#fast-final-coverage-viz .text-muted { color: var(--muted); }
+#fast-final-coverage-viz .tabular-nums { font-variant-numeric: tabular-nums; }
+#fast-final-coverage-viz .fast-final-gradient { flex-shrink: 0; }
+#fast-final-coverage-viz #fast-final-readout { margin-top: 16px; }
+.fast-method { margin-top: 32px; border-top: 1px solid var(--line); padding-top: 20px; }
+.fast-method summary { cursor: pointer; font-weight: 600; }
+.fast-method p { max-width: 900px; font-size: 1rem; margin-top: 16px; }
+@media (max-width: 700px) {
+  .fast-study { width: calc(100% - 32px); }
+  #fast-final-coverage-viz h3 { min-height: 0; }
+}
+

@@ -1,0 +1,26 @@
+---
+layout: default
+title: FAST coverage and sensitivity
+description: Interactive observing footprints and conditional sensitivity forecasts for combined FAST observations of HCG 100 and HCG 61 at a common 5.7-arcminute resolution.
+permalink: /research/fast-coverage/
+body_class: fast-coverage-page
+---
+<link rel="stylesheet" href="{{ '/assets/fast-coverage.css' | relative_url }}">
+<article class="wide-container fast-study">
+  <a class="section-link" href="{{ '/research/' | relative_url }}">← Back to Research</a>
+  <header class="fast-study-heading">
+    <p class="eyebrow">Hickson compact groups · FAST observing strategy</p>
+    <h1>Coverage &amp; sensitivity</h1>
+    <p>Existing observations and a proposed 2 × 2 extension, combined at a common target resolution of 5.7′.</p>
+  </header>
+  {% include fast-coverage.html %}
+  <noscript><p>Enable JavaScript to explore the observing footprints and sensitivity maps.</p></noscript>
+  <details class="fast-method">
+    <summary>Model assumptions and interpretation</summary>
+    <p>These are conditional noise forecasts, not measurements of the final data. The model combines an idealized 19-beam pattern with the planned pointing centers. Existing observations use 900 s ON-source per pointing; the proposed extensions use 2100 s for HCG 100 and 1800 s for HCG 61.</p>
+    <p>A circular native beam of 2.85′ is assumed. Direct gridding to a nominal 5.7′ beam uses an additional Gaussian kernel of approximately 4.94′. Independent spectrum variances are propagated through the normalized, integration-time-weighted kernel; the previous sampling-weight proxy is retained as a separate display.</p>
+    <p>The default reference is 4.5 × 10<sup>16</sup> cm<sup>−2</sup> (1σ per 20 km/s), quoted in the observing proposal for 900 s ON-source. Its association with the 4′ resolution of the earlier maps is an assumption, and the reference value can be adjusted. Relative RMS is normalized to the core of one existing field smoothed to 5.7′. The 100 km/s limit assumes five independent 20 km/s channels and a specified velocity window.</p>
+    <p>Blank regions have insufficient sampling support under a heuristic edge mask: nearest sample within 2.85′ and kernel-weighted centroid displacement within 1′. A uniform effective beam is not guaranteed near boundaries or gaps. Beam variations, RFI losses, shared-OFF covariance, spectral correlations, and baseline residuals are not included; final noise and resolution should be evaluated with the actual data and gridding pipeline.</p>
+  </details>
+</article>
+

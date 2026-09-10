@@ -1,0 +1,625 @@
+<div id="fast-final-coverage-viz">
+  <h2 class="fast-chart-title">Combined sampling and sensitivity</h2>
+  <div class="viz-controls" aria-label="Coverage controls">
+    <label class="form-label" for="fast-final-source">Source
+      <select class="form-select" id="fast-final-source">
+        <option value="hcg100">HCG 100</option>
+        <option value="hcg61">HCG 61</option>
+      </select>
+    </label>
+    <div class="viz-row" role="group" aria-label="Displayed data">
+      <button type="button" class="btn btn-primary" data-layer="all" aria-pressed="true">Combined</button>
+      <button type="button" class="btn" data-layer="existing" aria-pressed="false">Existing</button>
+      <button type="button" class="btn" data-layer="new" aria-pressed="false">New 2×2</button>
+    </div>
+  </div>
+
+  <div class="viz-controls" aria-label="Sensitivity controls">
+    <label class="form-label" for="fast-final-metric">Right-hand map
+      <select class="form-select" id="fast-final-metric">
+        <option value="nhi" selected>Expected 1σ N HI · 20 km/s</option>
+        <option value="integrated">Expected 3σ N HI · 100 km/s line</option>
+        <option value="relative">Relative RMS · common 5.7′ beam</option>
+        <option value="weight">Sampling weight (previous proxy)</option>
+      </select>
+    </label>
+    <label class="form-label" for="fast-final-anchor">Reference 1σ N HI (10¹⁶ cm⁻²; assumed 4′, 20 km/s)
+      <input class="form-control" id="fast-final-anchor" type="number" min="0.01" step="0.1" value="4.5">
+    </label>
+  </div>
+  <div class="fast-final-panels">
+    <section aria-labelledby="fast-final-layout-title">
+      <h3 id="fast-final-layout-title">All pointings and 19-beam sample centers</h3>
+      <canvas id="fast-final-layout" role="img" aria-label="All pointing centers and 19-beam sample centers from the existing and new observations"></canvas>
+    </section>
+    <section aria-labelledby="fast-final-weight-title">
+      <h3 id="fast-final-weight-title">Combined sampling weight at 5.7′ resolution</h3>
+      <canvas id="fast-final-weight" role="img" aria-label="Relative sampling weight of the combined existing and new observations at 5.7 arcminute resolution"></canvas>
+    </section>
+  </div>
+
+  <div class="fast-final-legend viz-row text-small" aria-label="Legend">
+    <span><i class="fast-final-mark fast-final-existing" aria-hidden="true"></i>Existing observations</span>
+    <span><i class="fast-final-mark fast-final-new" aria-hidden="true"></i>New 2×2</span>
+    <span><i class="fast-final-gradient" aria-hidden="true"></i><span id="fast-final-scale"></span></span>
+  </div>
+  <div id="fast-final-readout" class="text-small tabular-nums" aria-live="polite">Select a position on the right-hand map.</div>
+  <p id="fast-final-summary" class="text-small text-muted" aria-live="polite"></p>
+</div>
+
+<style>
+  #fast-final-coverage-viz {
+    width: 100%;
+  }
+  #fast-final-coverage-viz .fast-final-panels {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 12px;
+  }
+  #fast-final-coverage-viz section {
+    min-width: 0;
+  }
+  #fast-final-coverage-viz h3 {
+    margin-bottom: 6px;
+  }
+  #fast-final-coverage-viz canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+  }
+  #fast-final-coverage-viz .fast-final-legend {
+    margin-top: 10px;
+    gap: 16px;
+  }
+  #fast-final-coverage-viz .fast-final-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #fast-final-coverage-viz .fast-final-mark {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+  }
+  #fast-final-coverage-viz .fast-final-existing {
+    border-radius: 50%;
+    background: var(--viz-series-1);
+  }
+  #fast-final-coverage-viz .fast-final-new {
+    background: var(--viz-series-2);
+    transform: rotate(45deg);
+  }
+  #fast-final-coverage-viz .fast-final-gradient {
+    display: inline-block;
+    width: 64px;
+    height: 10px;
+    background: linear-gradient(90deg, transparent, var(--viz-series-3));
+  }
+  #fast-final-coverage-viz #fast-final-summary {
+    margin-top: 8px;
+  }
+  @media (max-width: 700px) {
+    #fast-final-coverage-viz .fast-final-panels {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+(() => {
+  const root = document.getElementById('fast-final-coverage-viz');
+  const sourceSelect = root.querySelector('#fast-final-source');
+  const layerButtons = [...root.querySelectorAll('[data-layer]')];
+  const layoutCanvas = root.querySelector('#fast-final-layout');
+  const weightCanvas = root.querySelector('#fast-final-weight');
+  const summary = root.querySelector('#fast-final-summary');
+  const metricSelect = root.querySelector('#fast-final-metric');
+  const anchorInput = root.querySelector('#fast-final-anchor');
+  const scaleLabel = root.querySelector('#fast-final-scale');
+  const readout = root.querySelector('#fast-final-readout');
+  let activeMap = null;
+  const noiseCache = new Map();
+  let selectedLayer = 'all';
+  let renderFrame = 0;
+
+  const sources = {
+    hcg100: {
+      label: 'HCG 100',
+      reference: { raSeconds: 82.16, decArcsec: 47156.44, label: '00:01:22.16, +13:05:56.44' },
+      fields: [
+        { label: 'Existing FOV 1', short: 'Existing 1', kind: 'existing', grid: '4x4', raSeconds: 82.16, decArcsec: 47156.44, dwell: 900 },
+        { label: 'Existing FOV 2', short: 'Existing 2', kind: 'existing', grid: '4x4', raSeconds: 128.16, decArcsec: 46269.04, dwell: 900 },
+        { label: 'New Field 1', short: 'New F1', kind: 'new', grid: '2x2', raSeconds: 38.40, decArcsec: 48062.20, dwell: 2100 },
+        { label: 'New Field 2', short: 'New F2', kind: 'new', grid: '2x2', raSeconds: 143.36, decArcsec: 47775.60, dwell: 2100 },
+        { label: 'New Field 3', short: 'New F3', kind: 'new', grid: '2x2', raSeconds: 21.84, decArcsec: 46568.20, dwell: 2100 }
+      ],
+      newWeightRatio: 0.58,
+      newRmsRatio: 1.31
+    },
+    hcg61: {
+      label: 'HCG 61',
+      reference: { raSeconds: 43942.80, decArcsec: 104990.80, label: '12:12:22.80, +29:09:50.8' },
+      fields: [
+        { label: 'Existing FOV', short: 'Existing', kind: 'existing', grid: '4x4', raSeconds: 43942.80, decArcsec: 104990.80, dwell: 900 },
+        { label: 'New Field 1', short: 'New F1', kind: 'new', grid: '2x2', raSeconds: 43973.04, decArcsec: 103777.20, dwell: 1800 }
+      ],
+      newWeightRatio: 0.50,
+      newRmsRatio: 1.41
+    }
+  };
+
+  function colorValue(name) {
+    const probe = document.createElement('span');
+    probe.style.color = `var(${name})`;
+    probe.style.display = 'none';
+    root.appendChild(probe);
+    const value = getComputedStyle(probe).color;
+    probe.remove();
+    return value;
+  }
+
+  function rgb(color) {
+    const values = color.match(/[\d.]+/g);
+    return values && values.length >= 3 ? values.slice(0, 3).map(Number) : [128, 128, 128];
+  }
+
+  function rgba(color, alpha) {
+    const value = rgb(color);
+    return `rgba(${value[0]}, ${value[1]}, ${value[2]}, ${alpha})`;
+  }
+
+  function hex19(spacing = 5.7) {
+    const points = [];
+    for (let q = -2; q <= 2; q += 1) {
+      for (let r = -2; r <= 2; r += 1) {
+        if (Math.max(Math.abs(q), Math.abs(r), Math.abs(q + r)) <= 2) {
+          points.push({ x: spacing * (q + r / 2), y: spacing * Math.sqrt(3) * r / 2 });
+        }
+      }
+    }
+    return points;
+  }
+
+  const feedOffsets = hex19();
+
+  function fieldCenter(source, field) {
+    const referenceDec = source.reference.decArcsec / 3600;
+    const x = (field.raSeconds - source.reference.raSeconds) * 15 / 60 * Math.cos(referenceDec * Math.PI / 180);
+    const y = (field.decArcsec - source.reference.decArcsec) / 60;
+    return { x, y };
+  }
+
+  function pointingOffsets(field) {
+    const dec = field.decArcsec / 3600;
+    const cosDec = Math.cos(dec * Math.PI / 180);
+    if (field.grid === '4x4') {
+      const xs = [-2.1, -0.7, 0.7, 2.1].map(value => value * cosDec);
+      const ys = [1.8, 0.6, -0.6, -1.8];
+      return ys.flatMap(y => xs.map(x => ({ x, y })));
+    }
+    const xs = [-1.425, 1.425].map(value => value * cosDec);
+    const ys = [1.25, -1.25];
+    return ys.flatMap(y => xs.map(x => ({ x, y })));
+  }
+
+  function buildGeometry(source, layer = 'all') {
+    const fields = source.fields.filter(field => layer === 'all' || field.kind === layer);
+    const pointings = [];
+    const samples = [];
+    fields.forEach((field, fieldIndex) => {
+      const center = fieldCenter(source, field);
+      pointingOffsets(field).forEach((offset, pointingIndex) => {
+        const pointing = {
+          x: center.x + offset.x,
+          y: center.y + offset.y,
+          kind: field.kind,
+          dwell: field.dwell,
+          field,
+          fieldIndex,
+          pointingIndex
+        };
+        pointings.push(pointing);
+        feedOffsets.forEach((feed, feedIndex) => {
+          samples.push({
+            x: pointing.x + feed.x,
+            y: pointing.y + feed.y,
+            kind: field.kind,
+            dwell: field.dwell,
+            field,
+            feedIndex
+          });
+        });
+      });
+    });
+    return { fields, pointings, samples };
+  }
+
+  function domainFor(source) {
+    const all = buildGeometry(source, 'all').samples;
+    const xs = all.map(point => point.x);
+    const ys = all.map(point => point.y);
+    const xmin = Math.min(...xs) - 3.5;
+    const xmax = Math.max(...xs) + 3.5;
+    const ymin = Math.min(...ys) - 3.5;
+    const ymax = Math.max(...ys) + 3.5;
+    const cx = (xmin + xmax) / 2;
+    const cy = (ymin + ymax) / 2;
+    const half = Math.ceil(Math.max(xmax - xmin, ymax - ymin) / 10) * 5;
+    return { xmin: cx - half, xmax: cx + half, ymin: cy - half, ymax: cy + half };
+  }
+
+  function setupCanvas(canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const size = Math.max(280, Math.floor(rect.width));
+    canvas.width = Math.floor(size * dpr);
+    canvas.height = Math.floor(size * dpr);
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, width: size, height: size };
+  }
+
+  function plotGeometry(width, height, domain) {
+    const margin = { left: 58, right: 16, top: 16, bottom: 52 };
+    const plotWidth = width - margin.left - margin.right;
+    const plotHeight = height - margin.top - margin.bottom;
+    const x = value => margin.left + (domain.xmax - value) / (domain.xmax - domain.xmin) * plotWidth;
+    const y = value => margin.top + (domain.ymax - value) / (domain.ymax - domain.ymin) * plotHeight;
+    return { width, height, margin, plotWidth, plotHeight, domain, x, y };
+  }
+
+  function niceTicks(minimum, maximum, maximumCount) {
+    const range = maximum - minimum;
+    const raw = range / Math.max(1, maximumCount - 1);
+    const power = 10 ** Math.floor(Math.log10(raw));
+    const scaled = raw / power;
+    const factor = scaled <= 1 ? 1 : scaled <= 2 ? 2 : scaled <= 5 ? 5 : 10;
+    const step = factor * power;
+    const first = Math.ceil(minimum / step) * step;
+    const ticks = [];
+    for (let value = first; value <= maximum + step * 0.01; value += step) ticks.push(value);
+    return ticks;
+  }
+
+  function drawAxes(ctx, geom, colors, fillPlot = true) {
+    const { width, height, margin, plotWidth, plotHeight, domain, x, y } = geom;
+    if (fillPlot) {
+      ctx.fillStyle = colors.background;
+      ctx.fillRect(margin.left, margin.top, plotWidth, plotHeight);
+    }
+    ctx.save();
+    ctx.strokeStyle = rgba(colors.border, 0.65);
+    ctx.lineWidth = 1;
+    ctx.strokeRect(margin.left, margin.top, plotWidth, plotHeight);
+    ctx.font = '12px sans-serif';
+    ctx.fillStyle = colors.foreground;
+    const tickCount = width < 380 ? 4 : 6;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    niceTicks(domain.xmin, domain.xmax, tickCount).forEach(tick => {
+      const px = x(tick);
+      ctx.strokeStyle = rgba(colors.border, Math.abs(tick) < 1e-6 ? 0.55 : 0.25);
+      ctx.beginPath();
+      ctx.moveTo(px, margin.top);
+      ctx.lineTo(px, margin.top + plotHeight);
+      ctx.stroke();
+      ctx.fillStyle = colors.foreground;
+      ctx.fillText(String(Math.round(tick)), px, margin.top + plotHeight + 7);
+    });
+    ctx.fillText('ΔRA cos δ (arcmin; East ←)', margin.left + plotWidth / 2, height - 18);
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    niceTicks(domain.ymin, domain.ymax, tickCount).forEach(tick => {
+      const py = y(tick);
+      ctx.strokeStyle = rgba(colors.border, Math.abs(tick) < 1e-6 ? 0.55 : 0.25);
+      ctx.beginPath();
+      ctx.moveTo(margin.left, py);
+      ctx.lineTo(margin.left + plotWidth, py);
+      ctx.stroke();
+      ctx.fillStyle = colors.foreground;
+      ctx.fillText(String(Math.round(tick)), margin.left - 8, py);
+    });
+    ctx.save();
+    ctx.translate(15, margin.top + plotHeight / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('ΔDec (arcmin)', 0, 0);
+    ctx.restore();
+    ctx.restore();
+  }
+
+  function drawPointing(ctx, geom, pointing, colors) {
+    const px = geom.x(pointing.x);
+    const py = geom.y(pointing.y);
+    if (pointing.kind === 'existing') {
+      ctx.strokeStyle = colors.series1;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.stroke();
+    } else {
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = colors.series2;
+      ctx.fillRect(-4, -4, 8, 8);
+      ctx.restore();
+    }
+  }
+
+  function drawLayout(source, geometry, domain, colors) {
+    const { ctx, width, height } = setupCanvas(layoutCanvas);
+    const geom = plotGeometry(width, height, domain);
+    drawAxes(ctx, geom, colors, true);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(geom.margin.left, geom.margin.top, geom.plotWidth, geom.plotHeight);
+    ctx.clip();
+    geometry.samples.forEach(sample => {
+      ctx.fillStyle = sample.kind === 'existing' ? rgba(colors.series1, 0.72) : rgba(colors.series2, 0.82);
+      ctx.beginPath();
+      ctx.arc(geom.x(sample.x), geom.y(sample.y), 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    geometry.pointings.forEach(pointing => drawPointing(ctx, geom, pointing, colors));
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    geometry.fields.forEach(field => {
+      const center = fieldCenter(source, field);
+      ctx.fillStyle = colors.foreground;
+      ctx.fillText(field.short, geom.x(center.x) + 6, geom.y(center.y) - 6);
+    });
+    ctx.restore();
+  }
+
+  function baselineWeight(source) {
+    const field = source.fields.find(candidate => candidate.kind === 'existing');
+    const center = fieldCenter(source, field);
+    const geometry = buildGeometry({ ...source, fields: [field] }, 'all');
+    const values = [];
+    for (let dx = -8; dx <= 8.001; dx += 0.8) {
+      for (let dy = -8; dy <= 8.001; dy += 0.8) {
+        let weight = 0;
+        geometry.samples.forEach(sample => {
+          const rx = center.x + dx - sample.x;
+          const ry = center.y + dy - sample.y;
+          weight += sample.dwell * Math.exp(-4 * Math.log(2) * (rx * rx + ry * ry) / (5.7 * 5.7));
+        });
+        values.push(weight);
+      }
+    }
+    values.sort((a, b) => a - b);
+    return values[Math.floor(values.length / 2)];
+  }
+
+  function drawWeight(source, geometry, domain, colors) {
+    if (metricSelect.value !== 'weight') {
+      drawSensitivity(source, geometry, domain, colors);
+      return;
+    }
+    activeMap = null;
+    readout.textContent = 'Geometric weight proxy; select an RMS or N HI map for noise propagation.';
+    root.querySelector('#fast-final-weight-title').textContent = 'Sampling weight proxy (5.7′ kernel)';
+    root.querySelector('.fast-final-gradient').style.background = `linear-gradient(90deg, transparent, ${colors.series3})`;
+    scaleLabel.textContent = 'Relative weight 0 → ≥2 (existing single-field core = 1)';
+    const { ctx, width, height } = setupCanvas(weightCanvas);
+    const geom = plotGeometry(width, height, domain);
+    const cells = width < 380 ? 56 : 72;
+    const values = [];
+    const baseline = baselineWeight(source);
+    for (let row = 0; row < cells; row += 1) {
+      const y = domain.ymax - (row + 0.5) * (domain.ymax - domain.ymin) / cells;
+      for (let col = 0; col < cells; col += 1) {
+        const x = domain.xmax - (col + 0.5) * (domain.xmax - domain.xmin) / cells;
+        let weight = 0;
+        geometry.samples.forEach(sample => {
+          const dx = x - sample.x;
+          const dy = y - sample.y;
+          weight += sample.dwell * Math.exp(-4 * Math.log(2) * (dx * dx + dy * dy) / (5.7 * 5.7));
+        });
+        values.push(weight / baseline);
+      }
+    }
+
+    const image = ctx.createImageData(cells, cells);
+    const background = rgb(colors.background);
+    const series = rgb(colors.series3);
+    values.forEach((value, index) => {
+      const t = Math.max(0, Math.min(1, value / 2));
+      const eased = Math.pow(t, 0.65);
+      image.data[index * 4] = Math.round(background[0] + (series[0] - background[0]) * eased);
+      image.data[index * 4 + 1] = Math.round(background[1] + (series[1] - background[1]) * eased);
+      image.data[index * 4 + 2] = Math.round(background[2] + (series[2] - background[2]) * eased);
+      image.data[index * 4 + 3] = 255;
+    });
+    const buffer = document.createElement('canvas');
+    buffer.width = cells;
+    buffer.height = cells;
+    buffer.getContext('2d').putImageData(image, 0, 0);
+
+    drawAxes(ctx, geom, colors, true);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(buffer, geom.margin.left, geom.margin.top, geom.plotWidth, geom.plotHeight);
+    drawAxes(ctx, geom, colors, false);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(geom.margin.left, geom.margin.top, geom.plotWidth, geom.plotHeight);
+    ctx.clip();
+    geometry.samples.forEach(sample => {
+      ctx.fillStyle = sample.kind === 'existing' ? colors.series1 : colors.series2;
+      ctx.beginPath();
+      ctx.arc(geom.x(sample.x), geom.y(sample.y), 1.1, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  function updateSummary(source, geometry) {
+    const existingPointings = source.fields.filter(field => field.kind === 'existing').reduce((sum, field) => sum + pointingOffsets(field).length, 0);
+    const newPointings = source.fields.filter(field => field.kind === 'new').reduce((sum, field) => sum + pointingOffsets(field).length, 0);
+    const existingHours = source.fields.filter(field => field.kind === 'existing').reduce((sum, field) => sum + pointingOffsets(field).length * field.dwell / 3600, 0);
+    const newHours = source.fields.filter(field => field.kind === 'new').reduce((sum, field) => sum + pointingOffsets(field).length * field.dwell / 3600, 0);
+    if (selectedLayer === 'all') {
+      summary.textContent = `${source.label} | Final: ${existingPointings + newPointings} pointings (${existingPointings} existing + ${newPointings} new) | ${geometry.samples.length} beam sample centers | ON-source ${existingHours.toFixed(1)} + ${newHours.toFixed(1)} h | New-area weight ≈ ${source.newWeightRatio.toFixed(2)}, rms ≈ ${source.newRmsRatio.toFixed(2)}× the existing area`;
+    } else if (selectedLayer === 'existing') {
+      summary.textContent = `${source.label} | Existing: ${existingPointings} pointings | ${geometry.samples.length} beam sample centers | ON-source ${existingHours.toFixed(1)} h | Reference coordinate ${source.reference.label}`;
+    } else {
+      summary.textContent = `${source.label} | New: ${newPointings} pointings | ${geometry.samples.length} beam sample centers | ON-source ${newHours.toFixed(1)} h | New-area weight ≈ ${source.newWeightRatio.toFixed(2)}, rms ≈ ${source.newRmsRatio.toFixed(2)}× the existing area`;
+    }
+  }
+
+  // Independent ON-OFF spectra: Var_i = C² / t_i (equal ON/OFF ratio).
+  // The common ON-OFF factor is absorbed into the empirical reference noise.
+  // Normalized gridding uses a_i = t_i K_i / sum(t K), hence
+  // sigma/C = sqrt(sum(t K²)) / sum(t K), not 1/sqrt(sum(t K)).
+  function noiseAt(samples, x, y, targetBeam) {
+    const kernel2 = targetBeam * targetBeam - 2.85 * 2.85;
+    let sum = 0, sum2 = 0, sx = 0, sy = 0, nearest2 = Infinity;
+    for (const s of samples) {
+      const dx = s.x - x, dy = s.y - y, d2 = dx * dx + dy * dy;
+      nearest2 = Math.min(nearest2, d2);
+      const k = Math.exp(-4 * Math.log(2) * d2 / kernel2);
+      const w = s.dwell * k;
+      sum += w; sum2 += w * k; sx += w * dx; sy += w * dy;
+    }
+    return { noise: Math.sqrt(sum2) / sum,
+      valid: sum > 0 && nearest2 <= 2.85 ** 2 && Math.hypot(sx, sy) / sum <= 1.0 };
+  }
+
+  function median(values) {
+    const sorted = [...values].sort((a, b) => a - b);
+    return sorted[Math.floor(sorted.length / 2)];
+  }
+
+  function sensitivityGrid(source, geometry, domain) {
+    const key = source.label + selectedLayer;
+    if (noiseCache.has(key)) return noiseCache.get(key);
+    const field = source.fields.find(f => f.kind === 'existing');
+    const baseline = buildGeometry({...source, fields: [field]}).samples;
+    const center = fieldCenter(source, field);
+    const old = [], smooth = [];
+    for (let x = -8; x <= 8.001; x += 0.8) for (let y = -8; y <= 8.001; y += 0.8) {
+      old.push(noiseAt(baseline, center.x + x, center.y + y, 4).noise);
+      smooth.push(noiseAt(baseline, center.x + x, center.y + y, 5.7).noise);
+    }
+    const ref4 = median(old), ref57 = median(smooth), cells = 120, points = [];
+    for (let row = 0; row < cells; row++) for (let col = 0; col < cells; col++) {
+      const x = domain.xmax - (col + 0.5) * (domain.xmax - domain.xmin) / cells;
+      const y = domain.ymax - (row + 0.5) * (domain.ymax - domain.ymin) / cells;
+      points.push(noiseAt(geometry.samples, x, y, 5.7));
+    }
+    const grid = {ref4, ref57, cells, points};
+    noiseCache.set(key, grid);
+    return grid;
+  }
+
+  function metricValue(point, grid) {
+    if (metricSelect.value === 'relative') return point.noise / grid.ref57;
+    const anchor = Number(anchorInput.value);
+    const factor = metricSelect.value === 'integrated' ? 3 * Math.sqrt(100 / 20) : 1;
+    return point.noise / grid.ref4 * anchor * factor;
+  }
+
+  function drawSensitivity(source, geometry, domain, colors) {
+    const {ctx, width, height} = setupCanvas(weightCanvas);
+    const geom = plotGeometry(width, height, domain);
+    const grid = sensitivityGrid(source, geometry, domain);
+    const relative = metricSelect.value === 'relative';
+    const integrated = metricSelect.value === 'integrated';
+    const factor = integrated ? 3 * Math.sqrt(5) : 1;
+    const lo = relative ? 0.5 : 2 * factor, hi = relative ? 2.5 : 10 * factor;
+    const units = relative ? '× reference RMS at 5.7′' : '×10¹⁶ cm⁻²';
+    const title = relative ? 'Relative RMS at 5.7′' : integrated ? 'Expected 3σ N HI · 5.7′, 100 km/s line' : 'Expected 1σ N HI · 5.7′, 20 km/s';
+    root.querySelector('#fast-final-weight-title').textContent = title;
+    const gradient = root.querySelector('.fast-final-gradient');
+    gradient.style.background = `linear-gradient(90deg, ${colors.series3}, ${colors.series2})`;
+    scaleLabel.textContent = `≤${lo.toFixed(1)} → ≥${hi.toFixed(1)} ${units}; lower = deeper; blank = insufficient support`;
+    drawAxes(ctx, geom, colors, true);
+    if (!(Number(anchorInput.value) > 0) && !relative) {
+      activeMap = null;
+      readout.textContent = 'Enter a positive reference sensitivity.';
+      return;
+    }
+    const pixels = ctx.createImageData(grid.cells, grid.cells);
+    const low = rgb(colors.series3), high = rgb(colors.series2), bg = rgb(colors.background);
+    grid.points.forEach((point, i) => {
+      const t = Math.max(0, Math.min(1, (metricValue(point, grid) - lo) / (hi - lo)));
+      for (let c = 0; c < 3; c++) pixels.data[4 * i + c] = point.valid ? Math.round(low[c] + t * (high[c] - low[c])) : bg[c];
+      pixels.data[4 * i + 3] = 255;
+    });
+    const buffer = document.createElement('canvas');
+    buffer.width = grid.cells; buffer.height = grid.cells;
+    buffer.getContext('2d').putImageData(pixels, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(buffer, geom.margin.left, geom.margin.top, geom.plotWidth, geom.plotHeight);
+    drawAxes(ctx, geom, colors, false);
+    activeMap = {grid, geom, units};
+    const valid = grid.points.filter(p => p.valid).map(p => metricValue(p, grid)).sort((a,b) => a-b);
+    readout.textContent = `Supported area: median ${median(valid).toFixed(2)}, P10–P90 ${valid[Math.floor(valid.length * 0.1)].toFixed(2)}–${valid[Math.floor(valid.length * 0.9)].toFixed(2)} ${units} | Click map for local value`;
+  }
+
+  function render() {
+    const source = sources[sourceSelect.value];
+    const geometry = buildGeometry(source, selectedLayer);
+    const domain = domainFor(source);
+    const colors = {
+      background: colorValue('--background'),
+      foreground: colorValue('--foreground'),
+      border: colorValue('--border'),
+      series1: colorValue('--viz-series-1'),
+      series2: colorValue('--viz-series-2'),
+      series3: colorValue('--viz-series-3')
+    };
+    drawLayout(source, geometry, domain, colors);
+    drawWeight(source, geometry, domain, colors);
+    updateSummary(source, geometry);
+    if (metricSelect.value !== 'weight') {
+      summary.textContent = `${source.label} | ${geometry.pointings.length} pointings · ${geometry.samples.length} beam samples | Common target beam 5.7′; native beam assumed 2.85′ | Independent-noise forecast; reference ${anchorInput.value} ×10¹⁶ cm⁻² at assumed 4′ / 20 km/s | Edge mask: nearest sample ≤2.85′ and kernel centroid shift ≤1′`;
+    }
+    layoutCanvas.setAttribute('aria-label', `${source.label} ${selectedLayer}: pointing centers and 19-beam sample centers`);
+    weightCanvas.setAttribute('aria-label', `${source.label} ${selectedLayer}: ${root.querySelector('#fast-final-weight-title').textContent}. ${readout.textContent}`);
+  }
+
+  function queueRender() {
+    cancelAnimationFrame(renderFrame);
+    renderFrame = requestAnimationFrame(render);
+  }
+
+  sourceSelect.addEventListener('change', queueRender);
+  metricSelect.addEventListener('change', queueRender);
+  anchorInput.addEventListener('input', queueRender);
+  weightCanvas.addEventListener('pointerdown', event => {
+    if (!activeMap) return;
+    const {grid, geom, units} = activeMap, rect = weightCanvas.getBoundingClientRect();
+    const u = ((event.clientX - rect.left) * geom.width / rect.width - geom.margin.left) / geom.plotWidth;
+    const v = ((event.clientY - rect.top) * geom.height / rect.height - geom.margin.top) / geom.plotHeight;
+    if (u < 0 || u >= 1 || v < 0 || v >= 1) return;
+    const point = grid.points[Math.floor(v * grid.cells) * grid.cells + Math.floor(u * grid.cells)];
+    const x = geom.domain.xmax - u * (geom.domain.xmax - geom.domain.xmin);
+    const y = geom.domain.ymax - v * (geom.domain.ymax - geom.domain.ymin);
+    readout.textContent = `Offset (${x.toFixed(1)}′, ${y.toFixed(1)}′): ${point.valid ? metricValue(point, grid).toFixed(2) + ' ' + units : 'insufficient sampling support; sensitivity not quoted'}`;
+  });
+  layerButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      selectedLayer = button.dataset.layer;
+      layerButtons.forEach(candidate => {
+        const active = candidate === button;
+        candidate.setAttribute('aria-pressed', String(active));
+        candidate.classList.toggle('btn-primary', active);
+      });
+      queueRender();
+    });
+  });
+  const resizeObserver = new ResizeObserver(queueRender);
+  resizeObserver.observe(root);
+  const themeObserver = new MutationObserver(queueRender);
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme', 'style'] });
+  queueRender();
+})();
+</script>
+
+
+
