@@ -68,7 +68,7 @@ description: Research by Qingzheng Yu on neutral hydrogen, galaxy interactions, 
         <a href="https://doi.org/10.3847/2041-8213/ae8f37">Yu et al. 2026, ApJL <span aria-hidden="true">↗</span></a>
         <a href="https://arxiv.org/abs/2607.21717">arXiv</a>
       </div>
-      <p><a class="button button-primary" href="{{ '/research/fast-coverage/' | relative_url }}">Explore FAST coverage &amp; sensitivity</a></p>
+      <p class="fast-coverage-entry"><a class="button button-primary" href="{{ '/research/fast-coverage/' | relative_url }}">Explore FAST coverage &amp; sensitivity</a></p>
     </div>
 
     <dl class="result-list">
