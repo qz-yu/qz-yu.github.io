@@ -1,5 +1,6 @@
 <div id="fast-final-coverage-viz">
   <h2 class="fast-chart-title">Combined sampling and sensitivity</h2>
+  <p class="text-small" id="fast-sky-spacing">New 2×2 pointings: 2.85′ east–west × 2.50′ north–south on the sky · source table revised 2026-10-02.</p>
   <div class="viz-controls" aria-label="Coverage controls">
     <label class="form-label" for="fast-final-source">Source
       <select class="form-select" id="fast-final-source">
@@ -130,22 +131,18 @@
       fields: [
         { label: 'Existing FOV 1', short: 'Existing 1', kind: 'existing', grid: '4x4', raSeconds: 82.16, decArcsec: 47156.44, dwell: 900 },
         { label: 'Existing FOV 2', short: 'Existing 2', kind: 'existing', grid: '4x4', raSeconds: 128.16, decArcsec: 46269.04, dwell: 900 },
-        { label: 'New Field 1', short: 'New F1', kind: 'new', grid: '2x2', raSeconds: 38.40, decArcsec: 48062.20, dwell: 2100 },
-        { label: 'New Field 2', short: 'New F2', kind: 'new', grid: '2x2', raSeconds: 143.36, decArcsec: 47775.60, dwell: 2100 },
-        { label: 'New Field 3', short: 'New F3', kind: 'new', grid: '2x2', raSeconds: 21.84, decArcsec: 46568.20, dwell: 2100 }
+        { label: 'New Field 1', short: 'New F1', kind: 'new', grid: '2x2', raSeconds: 38.40, decArcsec: 48062.20, onCoordinates: [[32.54,48137.2],[44.26,48137.2],[32.54,47987.2],[44.26,47987.2]], dwell: 2100 },
+        { label: 'New Field 2', short: 'New F2', kind: 'new', grid: '2x2', raSeconds: 143.36, decArcsec: 47775.60, onCoordinates: [[137.5,47850.6],[149.22,47850.6],[137.5,47700.6],[149.22,47700.6]], dwell: 2100 },
+        { label: 'New Field 3', short: 'New F3', kind: 'new', grid: '2x2', raSeconds: 21.84, decArcsec: 46568.20, onCoordinates: [[15.99,46643.2],[27.69,46643.2],[15.99,46493.2],[27.69,46493.2]], dwell: 2100 }
       ],
-      newWeightRatio: 0.58,
-      newRmsRatio: 1.31
     },
     hcg61: {
       label: 'HCG 61',
       reference: { raSeconds: 43942.80, decArcsec: 104990.80, label: '12:12:22.80, +29:09:50.8' },
       fields: [
         { label: 'Existing FOV', short: 'Existing', kind: 'existing', grid: '4x4', raSeconds: 43942.80, decArcsec: 104990.80, dwell: 900 },
-        { label: 'New Field 1', short: 'New F1', kind: 'new', grid: '2x2', raSeconds: 43973.04, decArcsec: 103777.20, dwell: 1800 }
+        { label: 'New Field 1', short: 'New F1', kind: 'new', grid: '2x2', raSeconds: 43973.04, decArcsec: 103777.20, onCoordinates: [[43966.53,103852.2],[43979.55,103852.2],[43966.53,103702.2],[43979.55,103702.2]], dwell: 1800 }
       ],
-      newWeightRatio: 0.50,
-      newRmsRatio: 1.41
     }
   };
 
@@ -190,7 +187,7 @@
     return { x, y };
   }
 
-  function pointingOffsets(field) {
+  function pointingOffsets(field, source = null) {
     const dec = field.decArcsec / 3600;
     const cosDec = Math.cos(dec * Math.PI / 180);
     if (field.grid === '4x4') {
@@ -198,9 +195,14 @@
       const ys = [1.8, 0.6, -0.6, -1.8];
       return ys.flatMap(y => xs.map(x => ({ x, y })));
     }
-    const xs = [-1.425, 1.425].map(value => value * cosDec);
-    const ys = [1.25, -1.25];
-    return ys.flatMap(y => xs.map(x => ({ x, y })));
+    // Absolute ON coordinates from the revised, rounded source table.
+    // Convert RA coordinate differences to the map's east-west metric once.
+    const referenceDec = source ? source.reference.decArcsec / 3600 : dec;
+    const projection = Math.cos(referenceDec * Math.PI / 180);
+    return field.onCoordinates.map(([ra, decArcsec]) => ({
+      x: (ra - field.raSeconds) * 15 / 60 * projection,
+      y: (decArcsec - field.decArcsec) / 60
+    }));
   }
 
   function buildGeometry(source, layer = 'all') {
@@ -209,7 +211,7 @@
     const samples = [];
     fields.forEach((field, fieldIndex) => {
       const center = fieldCenter(source, field);
-      pointingOffsets(field).forEach((offset, pointingIndex) => {
+      pointingOffsets(field, source).forEach((offset, pointingIndex) => {
         const pointing = {
           x: center.x + offset.x,
           y: center.y + offset.y,
@@ -463,11 +465,11 @@
     const existingHours = source.fields.filter(field => field.kind === 'existing').reduce((sum, field) => sum + pointingOffsets(field).length * field.dwell / 3600, 0);
     const newHours = source.fields.filter(field => field.kind === 'new').reduce((sum, field) => sum + pointingOffsets(field).length * field.dwell / 3600, 0);
     if (selectedLayer === 'all') {
-      summary.textContent = `${source.label} | Final: ${existingPointings + newPointings} pointings (${existingPointings} existing + ${newPointings} new) | ${geometry.samples.length} beam sample centers | ON-source ${existingHours.toFixed(1)} + ${newHours.toFixed(1)} h | New-area weight ≈ ${source.newWeightRatio.toFixed(2)}, rms ≈ ${source.newRmsRatio.toFixed(2)}× the existing area`;
+      summary.textContent = `${source.label} | Final: ${existingPointings + newPointings} pointings (${existingPointings} existing + ${newPointings} new) | ${geometry.samples.length} beam sample centers | ON-source ${existingHours.toFixed(1)} + ${newHours.toFixed(1)} h | New-grid sky spacing 2.85′ × 2.50′`;
     } else if (selectedLayer === 'existing') {
       summary.textContent = `${source.label} | Existing: ${existingPointings} pointings | ${geometry.samples.length} beam sample centers | ON-source ${existingHours.toFixed(1)} h | Reference coordinate ${source.reference.label}`;
     } else {
-      summary.textContent = `${source.label} | New: ${newPointings} pointings | ${geometry.samples.length} beam sample centers | ON-source ${newHours.toFixed(1)} h | New-area weight ≈ ${source.newWeightRatio.toFixed(2)}, rms ≈ ${source.newRmsRatio.toFixed(2)}× the existing area`;
+      summary.textContent = `${source.label} | New: ${newPointings} pointings | ${geometry.samples.length} beam sample centers | ON-source ${newHours.toFixed(1)} h | New-grid sky spacing 2.85′ × 2.50′`;
     }
   }
 
@@ -620,6 +622,4 @@
   queueRender();
 })();
 </script>
-
-
 
